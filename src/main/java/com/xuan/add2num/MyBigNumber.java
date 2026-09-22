@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
  */
 public class MyBigNumber {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(MyBigNumber.class);
+    private static final Logger log =
+        LoggerFactory.getLogger(MyBigNumber.class);
 
     /**
      * Adds two non-negative integer numbers represented as strings.
@@ -68,6 +68,7 @@ public class MyBigNumber {
         int progress;
 
         int maxLength = Math.max(stn1.length(), stn2.length());
+        int totalSteps = maxLength + 1;
 
         char[] result = new char[maxLength + 1];
 
@@ -95,11 +96,11 @@ public class MyBigNumber {
 
             result[position] = (char) ('0' + digit);
 
-            progress = (step * 100) / maxLength;
+            progress = Math.min(100, (step * 100) / totalSteps);
             listener.onProgress(progress);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                         "Step {}: digit1={}, digit2={}, previousCarry={}, total={}, digit={}, nextCarry={}",
                         step,
                         digit1,
@@ -122,7 +123,7 @@ public class MyBigNumber {
         String finalResult =
                 new String(result, start, result.length - start);
 
-        logger.info(
+        log.info(
                 "Addition completed: {} + {} = {}",
                 stn1,
                 stn2,
@@ -138,12 +139,14 @@ public class MyBigNumber {
             throw new IllegalArgumentException(
                     "Number must not be null or empty.");
         }
+        int index = 0;
+        char character;
 
-        for (int i = 0; i < number.length(); i++) {
+        for (; index < number.length(); index++) {
 
-            char c = number.charAt(i);
+            character = number.charAt(index);
 
-            if (c < '0' || c > '9') {
+            if (character < '0' || character > '9') {
                 throw new IllegalArgumentException(
                         "Number must contain digits only.");
             }
