@@ -7,7 +7,7 @@
     <groupId>com.xuan</groupId>
     <artifactId>add2num-core</artifactId>
     <version>0.0.1</version>
-
+    <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>22</maven.compiler.source>
         <maven.compiler.target>22</maven.compiler.target>
