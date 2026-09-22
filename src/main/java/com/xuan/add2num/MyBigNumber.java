@@ -1,10 +1,30 @@
 package com.xuan.add2num;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Provides addition functionality for very large numbers represented as strings.
+ *
+ * <p>The addition is performed digit by digit from right to left without
+ * converting the entire input into a numeric type such as {@code long}
+ * or {@code BigInteger}.</p>
+ */
 public class MyBigNumber {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(MyBigNumber.class);
+
     /**
-     * Add two non-negative integer strings.
+     * Adds two non-negative integer numbers represented as strings.
      *
-     * This method keeps compatibility with the original Task 1 API.
+     * <p>Each digit is processed from right to left, and carry values are
+     * propagated to the next digit. The method supports numbers with
+     * different lengths.</p>
+     *
+     * @param stn1 the first number represented as a numeric string
+     * @param stn2 the second number represented as a numeric string
+     * @return the sum of {@code stn1} and {@code stn2} as a numeric string
      */
     public String sum(String stn1, String stn2) {
         return sum(stn1, stn2, progress -> {
@@ -13,14 +33,18 @@ public class MyBigNumber {
     }
 
     /**
-     * Add two large numbers and report real progress.
+     * Adds two non-negative integer numbers represented as strings.
      *
-     * Progress is calculated based on the number of digit-addition steps.
+     * <p>Each digit is processed from right to left, and carry values are
+     * propagated to the next digit. The method supports numbers with
+     * different lengths.</p>
+     *
+     * @param stn1 the first number represented as a numeric string
+     * @param stn2 the second number represented as a numeric string
+     * @param listener show process status
+     * @return the sum of {@code stn1} and {@code stn2} as a numeric string
      */
-    public String sum(
-            String stn1,
-            String stn2,
-            ProgressListener listener) {
+    public String sum(String stn1, String stn2, ProgressListener listener) {
 
         validate(stn1);
         validate(stn2);
@@ -30,59 +54,82 @@ public class MyBigNumber {
             };
         }
 
-        int totalSteps = Math.max(stn1.length(), stn2.length());
-
-        StringBuilder result = new StringBuilder(totalSteps + 1);
-
-        int index1 = stn1.length() - 1;
-        int index2 = stn2.length() - 1;
+        int i = stn1.length() - 1;
+        int j = stn2.length() - 1;
 
         int carry = 0;
-        int completedSteps = 0;
+        int step = 1;
 
-        while (index1 >= 0 || index2 >= 0 || carry != 0) {
+        int digit1;
+        int digit2;
+        int previousCarry;
+        int total;
+        int digit;
+        int progress;
 
-            int digit1 = 0;
-            int digit2 = 0;
+        int maxLength = Math.max(stn1.length(), stn2.length());
 
-            if (index1 >= 0) {
-                digit1 = stn1.charAt(index1) - '0';
-                index1--;
+        char[] result = new char[maxLength + 1];
+
+        int position = result.length - 1;
+
+        while (i >= 0 || j >= 0 || carry != 0) {
+
+            digit1 = 0;
+            digit2 = 0;
+
+            if (i >= 0) {
+                digit1 = stn1.charAt(i) - '0';
             }
 
-            if (index2 >= 0) {
-                digit2 = stn2.charAt(index2) - '0';
-                index2--;
+            if (j >= 0) {
+                digit2 = stn2.charAt(j) - '0';
             }
 
-            int sum = digit1 + digit2 + carry;
+            previousCarry = carry;
 
-            int resultDigit = sum % 10;
-            carry = sum / 10;
+            total = digit1 + digit2 + previousCarry;
 
-            result.append(resultDigit);
+            digit = total % 10;
+            carry = total / 10;
 
-            /*
-             * One progress step corresponds to one digit-addition step.
-             */
-            completedSteps++;
+            result[position] = (char) ('0' + digit);
 
-            int progress;
-
-            if (totalSteps == 0) {
-                progress = 100;
-            } else {
-                progress = completedSteps * 100 / totalSteps;
-
-                if (progress > 100) {
-                    progress = 100;
-                }
-            }
-
+            progress = (step * 100) / maxLength;
             listener.onProgress(progress);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                        "Step {}: digit1={}, digit2={}, previousCarry={}, total={}, digit={}, nextCarry={}",
+                        step,
+                        digit1,
+                        digit2,
+                        previousCarry,
+                        total,
+                        digit,
+                        carry
+                );
+            }
+
+            i--;
+            j--;
+            position--;
+            step++;
         }
 
-        return result.reverse().toString();
+        int start = position + 1;
+
+        String finalResult =
+                new String(result, start, result.length - start);
+
+        logger.info(
+                "Addition completed: {} + {} = {}",
+                stn1,
+                stn2,
+                finalResult
+        );
+
+        return finalResult;
     }
 
     private void validate(String number) {
@@ -102,4 +149,5 @@ public class MyBigNumber {
             }
         }
     }
+
 }
