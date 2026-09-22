@@ -65,5 +65,37 @@ class MyBigNumberTest {
     void shouldHandleAddingNumberToZero() {
         assertEquals("123", myBigNumber.sum("0", "123"));
     }
+    
+    // ==========================================
+    // TEST CASE VIẾT THÊM (Để phủ nhánh listener == null)
+    // ==========================================
+    @Test
+    void testSumWithNullListener() {
+        // 1. Khởi tạo Object chứa hàm sum
+    	MyBigNumber calculator = new MyBigNumber();
+
+        // 2. Chuẩn bị dữ liệu đầu vào hợp lệ để vượt qua hàm validate()
+        String stn1 = "10"; 
+        String stn2 = "20";
+        ProgressListener listener = null; // Ép giá trị null ở đây
+
+        // 3. Gọi hàm sum. Khi listener = null, code sẽ chạy vào trong khối if
+        // (Thay "String result =" bằng kiểu dữ liệu thực tế nếu cần)
+        String result = calculator.sum(stn1, stn2, listener);
+
+        // 4. Assert (Kiểm tra kết quả trả về của hàm sum có đúng kỳ vọng không)
+        // Ví dụ nếu hàm trả về chuỗi "30":
+        assertEquals("30", result); 
+    }
+
+    @Test
+    void shouldExecuteDebugLoggingBranch() {
+        MyBigNumber calculator = new MyBigNumber();
+
+        String result = calculator.sum("123", "456");
+
+        assertEquals("579", result);
+    }
+    
 
 }
